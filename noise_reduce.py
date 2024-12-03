@@ -29,7 +29,7 @@ def band_pass_filter(data, low_cutoff, high_cutoff, sr, order=5):
     low = low_cutoff / nyquist
     high = high_cutoff / nyquist
     b, a = butter(order, [low, high], btype='band', analog=False)
-    print("High Pass Transfer Function (H(z)):")
+    print("Band Pass Transfer Function (H(z)):")
     print("Numerator (b):", b)
     print("Denominator (a):", a)
     y_filtered = filtfilt(b, a, data)
@@ -50,24 +50,30 @@ def plot_frequency_spectrum(y, sr, title="Frequency Spectrum"):
     plt.show()
 
 def main():
-    filename = librosa.example('nutcracker')
+    # filename = librosa.example('nutcracker')
+    filename = "mixed_audio.wav"
     y, sr = librosa.load(filename, sr=None)
 
     # Set the cutoff frequency (example: 3000 Hz)
-    cutoff_frequency = 1500
-    low_frequency = 1000
-    high_frequency = 2000
+    low_frequency = 200
+    high_frequency = 900
 
     # Apply low-pass filter
     # y_filtered = low_pass_filter(y, cutoff_frequency, sr)
     # y_filtered = high_pass_filter(y, cutoff_frequency, sr)
-    y_filtered = band_pass_filter(y, low_frequency, high_frequency, sr)
+    low_pass = low_pass_filter(y, high_frequency, sr)
+    high_pass = high_pass_filter(y, low_frequency, sr)
+    band_pass = band_pass_filter(y, low_frequency, high_frequency, sr)
 
     # Save the filtered audio
-    sf.write('filtered_audio.wav', y_filtered, sr)
+    sf.write('low_pass.wav', low_pass, sr)
+    sf.write('high_pass.wav', high_pass, sr)
+    sf.write('band_pass.wav', band_pass, sr)
 
     plot_frequency_spectrum(y, sr, title="Original Audio Frequency Spectrum")
-    plot_frequency_spectrum(y_filtered, sr, title="Filtered Audio Frequency Spectrum")
+    plot_frequency_spectrum(low_pass, sr, title="Low Pass Audio Frequency Spectrum")
+    plot_frequency_spectrum(high_pass, sr, title="High Pass Audio Frequency Spectrum")
+    plot_frequency_spectrum(band_pass, sr, title="Band Pass Audio Frequency Spectrum")
 
 if __name__ == "__main__":
     main()
